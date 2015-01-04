@@ -3,12 +3,12 @@ from braces import views
 from django.views import generic
 from . import models
 from .forms import *
-
+from django.http import HttpResponse
 
 
 class RestrictToUserMixin(views.LoginRequiredMixin):
     def get_queryset(self):
-        queryset = super(self).get_queryset()
+        queryset = super(RestrictToUserMixin, self).get_queryset()
         queryset = queryset.filter(user=self.request.user)
         return queryset
 
@@ -25,11 +25,10 @@ class TalkListDetailView(
 ):
     model = models.TalkList
     prefetch_related = ('talks',)
+    form_class = forms.TalkFrom
+    
 
-    def get_queryset(self):
-        queryset = super(TalkListDetailView, self).get_queryset()
-        queryset = queryset.filter(user=self.request.user)
-        return queryset
+
 
 class TalkListCreateView(
      views.LoginRequiredMixin,
@@ -57,3 +56,6 @@ class TalkListUpdateView(
     form_class = TalkListForm
     headline = 'Update'
     model = models.TalkList
+
+
+
