@@ -46,11 +46,10 @@ class TalkForm(forms.ModelForm):
             )
         )
     def clean_when(self):
-        when = self.cleaned_data.get['when']
+        when = self.cleaned_data.get('when')
         pycon_start = datetime.datetime(2015, 1, 1)
         if when > pycon_start:
             return when
-
         else:
             raise ValidationError('Date Not Valid')
 

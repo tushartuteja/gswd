@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from braces import views
 from django.views import generic
 from . import models
-from .forms import *
+from .forms import TalkForm, TalkListForm
+from django.shortcuts import redirect
 from django.http import HttpResponse
 
 
@@ -25,8 +26,24 @@ class TalkListDetailView(
 ):
     model = models.TalkList
     prefetch_related = ('talks',)
-    form_class = forms.TalkFrom
-    
+    form_class = TalkForm
+    http_method_names = ['get', 'post']
+    def get_context_data(self, **kwargs):
+        context = super(TalkListDetailView, self).get_context_data(**kwargs)
+        context.update({'form': self.form_class(self.request.POST or None)})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            obj = self.get_object()
+            talk = form.save(commit=False)
+            talk.talk_list = obj
+            talk.save()
+        else:
+            return self.get(request, *args, **kwargs)
+        return redirect(obj)
+
 
 
 
